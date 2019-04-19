@@ -1,0 +1,24 @@
+server:
+  port: 9002
+
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          dropbox:
+            provider:      "dropbox"
+            client-name:   "Dropbox"
+            client-id:     "[env]"
+            client-secret: "[env]"
+            authorization-grant-type: "authorization_code"            redirect-uri:  "{baseUrl}/login/oauth2/code/{registrationId}"
+        provider: 
+          dropbox:
+            authorization-uri: "https://www.dropbox.com/oauth2/authorize"
+            token-uri:         "https://api.dropboxapi.com/oauth2/token"
+            user-info-uri:     "https://api.dropboxapi.com/2/users/get_account"
+            user-name-attribute: "account_id"
+            user-info-authentication-method: "form"              
+
+logging:  level:
+    com.example: DEBUG    org.springframework.web.client.RestTemplate: DEBUG
