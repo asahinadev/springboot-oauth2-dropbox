@@ -18,7 +18,7 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
-import com.example.spring.dropbox.oauth.service.DropBoxOAuth2UserService;
+import com.example.spring.dropbox.oauth.service.DropboxUserService;
 import com.example.spring.dropbox.oauth.token.AccessTokenResponseClient;
 
 @Configuration
@@ -100,7 +100,7 @@ public class SecurityConfiguig
 		List<OAuth2UserService<OAuth2UserRequest, OAuth2User>> userServices = new ArrayList<>();
 
 		// Drop Box 専用
-		userServices.add(new DropBoxOAuth2UserService());
+		userServices.add(new DropboxUserService());
 
 		// Custom UserService 
 		if (customUser.isEmpty() == false) {

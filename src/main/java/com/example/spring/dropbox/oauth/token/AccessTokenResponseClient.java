@@ -26,24 +26,28 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import com.example.spring.dropbox.oauth.interceptor.LoggingClientHttpRequestInterceptor;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class AccessTokenResponseClient
 		implements OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> {
 
-	private RestTemplate client;
+	private RestTemplate restTemplate;
 
 	public AccessTokenResponseClient() {
-		this.client = new RestTemplate(Arrays.asList(
+		this.restTemplate = new RestTemplate(Arrays.asList(
 				new FormHttpMessageConverter(),
 				new MappingJackson2HttpMessageConverter(),
 				new OAuth2AccessTokenResponseHttpMessageConverter()));
-		this.client.setErrorHandler(new OAuth2ErrorResponseErrorHandler());
+		this.restTemplate.setInterceptors(Arrays.asList(
+				new LoggingClientHttpRequestInterceptor()));
+		this.restTemplate.setErrorHandler(new OAuth2ErrorResponseErrorHandler());
 	}
 
 	public AccessTokenResponseClient(RestTemplate client) {
-		this.client = client;
+		this.restTemplate = client;
 	}
 
 	public OAuth2AccessTokenResponse getTokenResponse(
@@ -57,38 +61,38 @@ public class AccessTokenResponseClient
 		MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
 
 		parameters.add("grant_type", clientRegistration.getAuthorizationGrantType().getValue());
-		parameters.add("client_id", clientRegistration.getClientId());
-		parameters.add("client_secret", clientRegistration.getClientSecret());
 		parameters.add("code", authorization.getAuthorizationResponse().getCode());
 		parameters.add("redirect_uri", authorization.getAuthorizationRequest().getRedirectUri());
-		// parameters.add("scope", String.join(" ", request.getClientRegistration().getScopes()));
+
+		// 通常は設定されていたら [ ] 区切りで設定する
+		if (request.getClientRegistration().getScopes() != null
+				&& !request.getClientRegistration().getScopes().isEmpty()) {
+			parameters.add("scope", String.join(" ", request.getClientRegistration().getScopes()));
+		}
 
 		log.debug("parameters => {}", parameters);
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-		headers.setAccept(Arrays.asList(
-				MediaType.APPLICATION_JSON_UTF8));
+		headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON_UTF8));
 
 		switch (clientRegistration.getRegistrationId()) {
 
 		case "dropbox":
 			// Basic 認証
-			headers.setBasicAuth(
-					clientRegistration.getClientId(),
-					clientRegistration.getClientSecret());
-
-			parameters.remove("client_id");
-			parameters.remove("client_secret");
+			headers.setBasicAuth(clientRegistration.getClientId(), clientRegistration.getClientSecret());
 			break;
 
 		default:
+			// Form 認証
+			parameters.add("client_id", clientRegistration.getClientId());
+			parameters.add("client_secret", clientRegistration.getClientSecret());
 			break;
 		}
 
 		String uri = provider.getTokenUri();
 
-		ResponseEntity<AccessTokenResponce> response = client.exchange(
+		ResponseEntity<AccessTokenResponce> response = restTemplate.exchange(
 				uri,
 				HttpMethod.POST,
 				new HttpEntity<>(parameters, headers),
@@ -114,15 +118,24 @@ public class AccessTokenResponseClient
 			break;
 
 		}
+
 		long expiresIn = token.getExpiresIn();
 		if (expiresIn == 0) {
 			expiresIn = 30000;
 		}
 
-		Map<String, Object> additionalParameters = new HashMap<>(token.getAttributes());
+		Map<String, Object> additionalParameters = new HashMap<>();
+		switch (clientRegistration.getRegistrationId()) {
 
-		additionalParameters.put("uid", token.getUid());
-		additionalParameters.put("account_id", token.getAccountId());
+		// ユーザー検索のパラメーター設定
+		case "dropbox":
+			additionalParameters.put("account_id", token.getAttributes().get("account_id"));
+			break;
+
+		default:
+			break;
+
+		}
 
 		return OAuth2AccessTokenResponse.withToken(
 				token.getAccessToken())

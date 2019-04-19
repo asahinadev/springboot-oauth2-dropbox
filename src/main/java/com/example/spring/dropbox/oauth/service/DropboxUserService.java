@@ -1,6 +1,7 @@
 package com.example.spring.dropbox.oauth.service;
 
 import java.net.URI;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,16 +25,17 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.example.spring.dropbox.oauth.interceptor.LoggingClientHttpRequestInterceptor;
 import com.example.spring.dropbox.oauth.user.DropboxUser;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class DropBoxOAuth2UserService
+public class DropboxUserService
 		implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 	final String INVALID_USER_INFO_RESPONSE_ERROR_CODE = "invalid_user_info_response";
 
-	DropboxOAuth2UserRequestEntityConverter requestEntityConverter;
+	DropboxUserRequestEntityConverter requestEntityConverter;
 	RestTemplate restTemplate;
 
 	/**
@@ -44,10 +46,12 @@ public class DropBoxOAuth2UserService
 	 *                        by {@link ClientRegistration#getRegistrationId()
 	 *                        Registration Id}
 	 */
-	public DropBoxOAuth2UserService() {
+	public DropboxUserService() {
 		restTemplate = new RestTemplate();
 		restTemplate.setErrorHandler(new OAuth2ErrorResponseErrorHandler());
-		requestEntityConverter = new DropboxOAuth2UserRequestEntityConverter();
+		restTemplate.setInterceptors(Arrays.asList(
+				new LoggingClientHttpRequestInterceptor()));
+		requestEntityConverter = new DropboxUserRequestEntityConverter();
 	}
 
 	@Override
@@ -58,6 +62,7 @@ public class DropBoxOAuth2UserService
 		if (!Objects.equals(registrationId, "dropbox")) {
 			return null;
 		}
+		log.debug("loadUser {}", userRequest);
 
 		RequestEntity<?> request = this.requestEntityConverter.convert(userRequest);
 		ResponseEntity<? extends OAuth2User> response;
@@ -79,7 +84,8 @@ public class DropBoxOAuth2UserService
 		return oauth2User;
 	}
 
-	class DropboxOAuth2UserRequestEntityConverter implements Converter<OAuth2UserRequest, RequestEntity<?>> {
+	class DropboxUserRequestEntityConverter
+			implements Converter<OAuth2UserRequest, RequestEntity<?>> {
 
 		/**
 		 * Returns the {@link RequestEntity} used for the UserInfo Request.
@@ -89,6 +95,7 @@ public class DropBoxOAuth2UserService
 		 */
 		@Override
 		public RequestEntity<?> convert(OAuth2UserRequest userRequest) {
+
 			ClientRegistration clientRegistration = userRequest.getClientRegistration();
 
 			HttpMethod httpMethod = HttpMethod.POST;
@@ -105,7 +112,7 @@ public class DropBoxOAuth2UserService
 					.toUri();
 
 			Map<String, Object> body = new HashMap<>();
-			body.put("account_id", userRequest.getAdditionalParameters().get("account_id"));
+			body.putAll(userRequest.getAdditionalParameters());
 
 			return new RequestEntity<>(body, headers, httpMethod, uri);
 		}

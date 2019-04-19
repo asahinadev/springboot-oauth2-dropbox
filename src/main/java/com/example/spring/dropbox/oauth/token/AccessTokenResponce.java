@@ -39,12 +39,6 @@ public class AccessTokenResponce {
 	@JsonProperty("scope")
 	String scope;
 
-	@JsonProperty("uid")
-	String uid;
-
-	@JsonProperty("account_id")
-	String accountId;
-
 	@JsonAnySetter
 	Map<String, Object> attributes = new HashMap<>();
 
