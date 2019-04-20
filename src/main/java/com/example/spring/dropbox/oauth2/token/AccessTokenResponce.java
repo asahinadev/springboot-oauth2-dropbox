@@ -1,4 +1,4 @@
-package com.example.spring.dropbox.oauth.token;
+package com.example.spring.dropbox.oauth2.token;
 
 import java.util.Arrays;
 import java.util.Collections;

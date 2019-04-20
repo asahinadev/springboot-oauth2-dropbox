@@ -1,4 +1,4 @@
-package com.example.spring.dropbox.oauth.interceptor;
+package com.example.spring.dropbox.oauth2.interceptor;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

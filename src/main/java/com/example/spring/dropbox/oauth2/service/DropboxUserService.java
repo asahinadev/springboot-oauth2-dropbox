@@ -1,4 +1,4 @@
-package com.example.spring.dropbox.oauth.service;
+package com.example.spring.dropbox.oauth2.service;
 
 import java.net.URI;
 import java.util.Arrays;
@@ -25,8 +25,8 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.example.spring.dropbox.oauth.interceptor.LoggingClientHttpRequestInterceptor;
-import com.example.spring.dropbox.oauth.user.DropboxUser;
+import com.example.spring.dropbox.oauth2.interceptor.LoggingClientHttpRequestInterceptor;
+import com.example.spring.dropbox.oauth2.user.DropboxUser;
 
 import lombok.extern.slf4j.Slf4j;
 

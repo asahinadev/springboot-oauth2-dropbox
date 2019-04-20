@@ -1,4 +1,4 @@
-package com.example.spring.dropbox.oauth.token;
+package com.example.spring.dropbox.oauth2.token;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -26,7 +26,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import com.example.spring.dropbox.oauth.interceptor.LoggingClientHttpRequestInterceptor;
+import com.example.spring.dropbox.oauth2.interceptor.LoggingClientHttpRequestInterceptor;
 
 import lombok.extern.slf4j.Slf4j;
 

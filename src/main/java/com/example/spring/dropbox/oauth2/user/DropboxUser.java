@@ -1,4 +1,4 @@
-package com.example.spring.dropbox.oauth.user;
+package com.example.spring.dropbox.oauth2.user;
 
 import java.util.Arrays;
 import java.util.HashMap;

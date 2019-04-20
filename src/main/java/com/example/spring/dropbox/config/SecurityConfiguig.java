@@ -18,8 +18,8 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
-import com.example.spring.dropbox.oauth.service.DropboxUserService;
-import com.example.spring.dropbox.oauth.token.AccessTokenResponseClient;
+import com.example.spring.dropbox.oauth2.service.DropboxUserService;
+import com.example.spring.dropbox.oauth2.token.AccessTokenResponseClient;
 
 @Configuration
 @EnableWebSecurity
