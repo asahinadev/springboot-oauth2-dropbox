@@ -1,5 +1,10 @@
 server:
   port: 9002
+  ssl:
+    key-store:          "classpath:keystore.p12"
+    key-store-password: "12345678"
+    key-store-type:     "PKCS12"
+    key-alias:          "tomcat"
 
 spring:
   security:
@@ -9,15 +14,22 @@ spring:
           dropbox:
             provider:                 "dropbox"
             client-name:              "Dropbox"
+            
             client-id:                "[env]"
             client-secret:            "[env]"
             redirect-uri:             "{baseUrl}/login/oauth2/code/{registrationId}"
+            
             authorization-grant-type: "authorization_code"
+            client-authentication-method: "basic"
+            
         provider: 
           dropbox:
-            authorization-uri:        "https://www.dropbox.com/oauth2/authorize"
-            token-uri:                "https://api.dropboxapi.com/oauth2/token"
-            user-info-uri:            "https://api.dropboxapi.com/2/users/get_account"
+            authorization-uri:               "https://www.dropbox.com/oauth2/authorize"
+            token-uri:                       "https://api.dropboxapi.com/oauth2/token"
+            user-info-uri:                   "https://api.dropboxapi.com/2/users/get_account"
+            user-info-authentication-method: "json"
 
 logging:  level:
     com.example: DEBUG    org.springframework.web.client.RestTemplate: DEBUG
+    org.springframework.retry: DEBUG
+    org.apache.http.wire: DEBUG
