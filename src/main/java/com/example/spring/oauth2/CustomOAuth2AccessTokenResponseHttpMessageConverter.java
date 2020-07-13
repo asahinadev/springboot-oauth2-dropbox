@@ -1,17 +1,16 @@
 package com.example.spring.oauth2;
 
-import java.io.IOException;
-import java.util.Map;
+import java.util.*;
 
-import org.springframework.http.HttpInputMessage;
-import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.security.oauth2.core.OAuth2AccessToken.TokenType;
-import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
-import org.springframework.security.oauth2.core.http.converter.OAuth2AccessTokenResponseHttpMessageConverter;
+import org.springframework.http.*;
+import org.springframework.http.converter.*;
+import org.springframework.security.oauth2.core.OAuth2AccessToken.*;
+import org.springframework.security.oauth2.core.endpoint.*;
+import org.springframework.security.oauth2.core.http.converter.*;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.*;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.slf4j.*;
 
 @Slf4j
 public class CustomOAuth2AccessTokenResponseHttpMessageConverter
@@ -22,7 +21,7 @@ public class CustomOAuth2AccessTokenResponseHttpMessageConverter
 
 	protected OAuth2AccessTokenResponse readInternal(
 			Class<? extends OAuth2AccessTokenResponse> clazz, HttpInputMessage inputMessage)
-			throws IOException, HttpMessageNotReadableException {
+			throws HttpMessageNotReadableException {
 
 		try {
 			Map<String, String> tokenResponseParameters = new ObjectMapper()
